@@ -1,0 +1,40 @@
+
+name: Crear APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Contador_Truco_Chinchon_Completo.zip'
+      - '.github/workflows/main.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Descomprimir proyecto
+        run: |
+          unzip Contador_Truco_Chinchon_Completo.zip -d proyecto
+          ls -la proyecto
+
+      - name: Compilar APK
+        run: |
+          cd proyecto
+          chmod +x gradlew || true
+          gradle assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Contador-Truco-Chinchon-APK
+          path: proyecto/**/build/outputs/apk/debug/*.apk
+          
